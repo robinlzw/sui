@@ -1922,7 +1922,6 @@ dependencies = [
  "move-docgen",
  "move-model",
  "move-symbol-pool",
- "named-lock",
  "once_cell",
  "petgraph",
  "regex",
@@ -2231,20 +2230,6 @@ dependencies = [
  "proptest",
  "serde",
  "smallvec",
-]
-
-[[package]]
-name = "named-lock"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "40a3eb6b7c682b65d1f631ec3176829d72ab450b3aacdd3f719bf220822e59ac"
-dependencies = [
- "libc",
- "once_cell",
- "parking_lot 0.12.1",
- "thiserror",
- "widestring",
- "winapi",
 ]
 
 [[package]]
@@ -3854,12 +3839,6 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
 ]
-
-[[package]]
-name = "widestring"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17882f045410753661207383517a6f62ec3dbeb6a4ed2acce01f0728238d1983"
 
 [[package]]
 name = "winapi"
