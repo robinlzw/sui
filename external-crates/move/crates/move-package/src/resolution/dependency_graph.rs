@@ -457,33 +457,57 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                 eprintln!("new_for_dep -- Internal");
                 self.dependency_cache
                     .download_and_update_if_remote(dep_pkg_name, &d.kind, &mut self.progress_output)
-                    .with_context(|| format!("Fetching '{}'", dep_pkg_name))?;
+                    .with_context(|| {
+                        eprintln!("Fetching '{}'", dep_pkg_name); 
+                        format!("Fetching '{}'", dep_pkg_name)
+                    })?;
                 let pkg_path = dep_pkg_path.join(local_path(&d.kind));
+                eprintln!("before get_graph, pkg_path = {:?}", pkg_path.clone());
                 let manifest_string =
                     std::fs::read_to_string(pkg_path.join(SourcePackageLayout::Manifest.path()))
-                        .with_context(|| format!("Parsing manifest for '{}'", dep_pkg_name))?;
+                        .with_context(|| {
+                            eprintln!("Parsing manifest for '{}'", dep_pkg_name);
+                            format!("Parsing manifest for '{}'", dep_pkg_name)
+                        })?;
+                eprintln!("before read_to_string, manifest_string = {:?}", manifest_string.clone());
                 let lock_string =
                     std::fs::read_to_string(pkg_path.join(SourcePackageLayout::Lock.path())).ok();
+                eprintln!("after read_to_string");
 
+                eprintln!("before parse_source_manifest");
                 // resolve name and version
                 let manifest =
                     parse_source_manifest(parse_move_manifest_string(manifest_string.clone())?)?;
+                eprintln!("after parse_source_manifest");
+
+                eprintln!("before custom_resolve_pkg_id");
                 let resolved_pkg_id = custom_resolve_pkg_id(&manifest)
                     .with_context(|| format!("Resolving package name for '{}'", dep_pkg_name))?;
+                eprintln!("after custom_resolve_pkg_id");
+
+                eprintln!("before resolve_version");
                 let resolved_version = resolve_version(&manifest)
                     .with_context(|| format!("Resolving version for '{}'", dep_pkg_name))?;
+                eprintln!("after resolve_version");
+
+                eprintln!("before check_for_dep_cycles");
                 check_for_dep_cycles(
                     d.clone(),
                     resolved_pkg_id,
                     dep_pkg_name,
                     &mut self.visited_dependencies,
                 )?;
+                eprintln!("after check_for_dep_cycles");
 
                 // save dependency for cycle detection
                 self.visited_dependencies
                     .push_front((resolved_pkg_id, d.clone()));
+
+                eprintln!("before check_for_dep_cycles -- manifest_string = {:?}", manifest_string);
                 let (mut pkg_graph, modified) =
                     self.get_graph(&d.kind, pkg_path, manifest_string, lock_string)?;
+                eprintln!("after check_for_dep_cycles");
+
                 self.visited_dependencies.pop_front();
                 // reroot all packages to normalize local paths across all graphs
                 for (_, p) in pkg_graph.package_table.iter_mut() {
