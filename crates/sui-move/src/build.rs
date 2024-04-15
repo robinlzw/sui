@@ -37,6 +37,7 @@ impl Build {
         path: Option<PathBuf>,
         build_config: MoveBuildConfig,
     ) -> anyhow::Result<()> {
+        eprintln!("Building package at {:?}, build_config = {:?}", path, build_config);
         let rerooted_path = base::reroot_path(path.clone())?;
         let build_config = resolve_lock_file_path(build_config, path)?;
         Self::execute_internal(

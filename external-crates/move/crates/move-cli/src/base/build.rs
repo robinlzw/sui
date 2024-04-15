@@ -13,6 +13,7 @@ pub struct Build;
 
 impl Build {
     pub fn execute(self, path: Option<PathBuf>, config: BuildConfig) -> anyhow::Result<()> {
+        eprintln!("Building package at {:?} with config = [{:?}]", path, config);
         let rerooted_path = reroot_path(path)?;
         if config.fetch_deps_only {
             let mut config = config;

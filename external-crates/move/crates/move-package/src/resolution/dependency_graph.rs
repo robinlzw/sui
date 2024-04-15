@@ -222,6 +222,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
         manifest_string: String,
         lock_string_opt: Option<String>,
     ) -> Result<(DependencyGraph, bool)> {
+        eprintln!("get_graph >>");
         let toml_manifest = parse_move_manifest_string(manifest_string.clone())?;
         let root_manifest = parse_source_manifest(toml_manifest)?;
 
@@ -245,6 +246,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             )
         })?;
         let root_pkg_name = root_manifest.package.name;
+        eprintln!("get_graph -- collect_graphs<DependencyMode::Always>");
         let (mut dep_graphs, resolved_id_deps, mut dep_names, mut overrides) = self
             .collect_graphs(
                 parent,
@@ -254,11 +256,13 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                 DependencyMode::Always,
                 root_manifest.dependencies.clone(),
             )?;
+            eprintln!("get_graph -- write_to_lock");
         let dep_lock_files = dep_graphs
             .values()
             // write_to_lock should create a fresh lockfile for computing the dependency digest, hence the `None` arg below
             .map(|graph_info| graph_info.g.write_to_lock(self.install_dir.clone(), None))
             .collect::<Result<Vec<LockFile>>>()?;
+        eprintln!("get_graph -- collect_graphs<DependencyMode::DevOnly>");
         let (dev_dep_graphs, dev_resolved_id_deps, dev_dep_names, dev_overrides) = self
             .collect_graphs(
                 parent,
@@ -274,7 +278,9 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             // write_to_lock should create a fresh lockfile for computing the dependency digest, hence the `None` arg below
             .map(|graph_info| graph_info.g.write_to_lock(self.install_dir.clone(), None))
             .collect::<Result<Vec<LockFile>>>()?;
+        eprintln!("get_graph -- got dev_dep_lock_files");
         let new_deps_digest = self.dependency_digest(dep_lock_files, dev_dep_lock_files)?;
+        eprintln!("get_graph -- got new_deps_digest");
         let (manifest_digest, deps_digest) = match digest_and_lock_contents {
             Some((old_manifest_digest, old_deps_digest, Some(lock_string)))
                 if old_manifest_digest == new_manifest_digest
@@ -294,8 +300,10 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             _ => (new_manifest_digest, new_deps_digest),
         };
 
+        eprintln!("get_graph -- before dep_graphs.extend");
         dep_graphs.extend(dev_dep_graphs);
         dep_names.extend(dev_dep_names);
+        eprintln!("get_graph -- after dep_graphs.extend");
 
         let mut combined_graph = DependencyGraph {
             root_path,
@@ -323,6 +331,8 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             },
         ) in dep_graphs.iter_mut()
         {
+            eprintln!("get_graph -- before prune_subgraph");
+
             g.prune_subgraph(
                 root_pkg_name,
                 *dep_id,
@@ -334,12 +344,15 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             )?;
         }
 
+        eprintln!("get_graph -- start all_deps extend");
         let mut all_deps = resolved_id_deps;
         all_deps.extend(dev_resolved_id_deps);
+        eprintln!("get_graph -- end all_deps extend");
 
         // we can mash overrides together as the sets cannot overlap (it's asserted during pruning)
         overrides.extend(dev_overrides);
 
+        eprintln!("get_graph -- before combined_graph.merge");
         combined_graph.merge(
             dep_graphs,
             parent,
@@ -348,10 +361,13 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
             &dep_names,
             root_pkg_name,
         )?;
+        eprintln!("get_graph -- after combined_graph.merge");
 
         combined_graph.check_acyclic()?;
+        eprintln!("get_graph -- after check_acyclic");
         combined_graph.discover_always_deps();
 
+        eprintln!("get_graph -- after discover_always_deps");
         Ok((combined_graph, true))
     }
 
@@ -438,6 +454,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
     ) -> Result<(DependencyGraph, bool, bool, Symbol, Option<Symbol>)> {
         let (pkg_graph, is_override, is_external, resolved_pkg_name, resolved_version) = match dep {
             PM::Dependency::Internal(d) => {
+                eprintln!("new_for_dep -- Internal");
                 self.dependency_cache
                     .download_and_update_if_remote(dep_pkg_name, &d.kind, &mut self.progress_output)
                     .with_context(|| format!("Fetching '{}'", dep_pkg_name))?;
@@ -490,6 +507,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                 )
             }
             PM::Dependency::External(resolver) => {
+                eprintln!("new_for_dep -- External");
                 let pkg_graph = DependencyGraph::get_external(
                     mode,
                     parent_pkg_id,

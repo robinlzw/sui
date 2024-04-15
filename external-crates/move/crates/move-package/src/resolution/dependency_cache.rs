@@ -45,6 +45,7 @@ impl DependencyCache {
         kind: &DependencyKind,
         progress_output: &mut Progress,
     ) -> Result<()> {
+        eprintln!("dep_name = {:?}; kind = {:?}", dep_name, kind);
         match kind {
             DependencyKind::Local(_) => Ok(()),
 

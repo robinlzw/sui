@@ -287,12 +287,15 @@ impl BuildConfig {
             writer,
             install_dir.clone(),
         );
+
+        eprintln!("resolution_graph_for_package -- before dep_graph_builder.get_graph");
         let (dependency_graph, modified) = dep_graph_builder.get_graph(
             &DependencyKind::default(),
             path,
             manifest_string,
             lock_string,
         )?;
+        eprintln!("resolution_graph_for_package -- after dep_graph_builder.get_graph");
 
         if modified || install_dir_set {
             // (1) Write the Move.lock file if the existing one is `modified`, or
@@ -309,6 +312,7 @@ impl BuildConfig {
             ..
         } = dep_graph_builder;
 
+        eprintln!("resolution_graph_for_package -- before ResolvedGraph::resolve");
         ResolvedGraph::resolve(
             dependency_graph,
             self,
