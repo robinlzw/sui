@@ -463,6 +463,17 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                     })?;
                 let pkg_path = dep_pkg_path.join(local_path(&d.kind));
                 eprintln!("before get_graph, pkg_path = {:?}", pkg_path.clone());
+                for entry in walkdir::WalkDir::new(pkg_path.as_path()) {
+                    let entry_raw = entry?;
+
+                    if entry_raw.path().is_file() {
+                        let move_file_path = entry_raw.path().to_str();
+                        if let Some(f) = move_file_path {
+                            eprintln!("find file {:?}", f.to_string());
+                        }
+                    }
+                }
+
                 let manifest_string =
                     std::fs::read_to_string(pkg_path.join(SourcePackageLayout::Manifest.path()))
                         .with_context(|| {
