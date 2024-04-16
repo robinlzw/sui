@@ -127,6 +127,7 @@ impl BuildConfig {
         writer: &mut W,
     ) -> anyhow::Result<(MoveCompiledPackage, FnInfoMap)> {
         let build_plan = BuildPlan::create(resolution_graph)?;
+        eprintln!("********************* \n build_plan = {:?}", build_plan);
         let mut fn_info = None;
         let compiled_pkg = build_plan.compile_with_driver(writer, |compiler| {
             let (files, units_res) = compiler.build()?;

@@ -487,6 +487,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                         eprintln!("Fetching '{}'", dep_pkg_name); 
                         format!("Fetching '{}'", dep_pkg_name)
                     })?;
+                eprintln!("dep_pkg_path = {:?}", dep_pkg_path.clone());
                 let pkg_path = dep_pkg_path.join(local_path(&d.kind));
                 eprintln!("before get_graph, pkg_path = {:?}", pkg_path.clone());
                 let pkg_path = normal_path(pkg_path.as_path());

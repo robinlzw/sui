@@ -272,7 +272,10 @@ impl BuildConfig {
         if self.test_mode {
             self.dev_mode = true;
         }
+        eprintln!("resolution_graph_for_package -- before try_find_root, path = {:?}", path);
         let path = SourcePackageLayout::try_find_root(path)?;
+        let path = crate::resolution::dependency_graph::normal_path(&path);
+        eprintln!("resolution_graph_for_package -- after try_find_root, path = {:?}", path.clone());
         let manifest_string =
             std::fs::read_to_string(path.join(SourcePackageLayout::Manifest.path()))?;
         let lock_path = path.join(SourcePackageLayout::Lock.path());
