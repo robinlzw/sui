@@ -106,9 +106,12 @@ impl ResolvedGraph {
                 dependency_cache
                     .download_and_update_if_remote(pkg_id, &pkg.kind, progress_output)
                     .with_context(|| format!("Fetching '{pkg_id}'"))?;
+                eprintln!("Resolving package '{pkg_id}', graph.root_path = {:?}, pkg.kind = {:?}", 
+                    graph.root_path.clone(), pkg.kind);
                 graph.root_path.join(local_path(&pkg.kind))
             };
 
+            eprintln!("package_path = {:?}", package_path);
             let mut resolved_pkg = Package::new(package_path, &build_options)
                 .with_context(|| format!("Resolving package '{pkg_id}'"))?;
 
@@ -124,7 +127,9 @@ impl ResolvedGraph {
                             continue;
                         }
                         let dep_path = &resolved_pkg.package_path.join(local_path(&internal.kind));
+                        eprintln!("dep_pat = {:?}", dep_path.clone());
                         let dep_manifest = parse_move_manifest_from_file(dep_path)?;
+                        eprintln!("dep_manifest = {:?}", dep_manifest.package.name.clone());
                         if dep_name != &dep_manifest.package.name {
                             bail!(
                                 "Name of dependency '{}' does not match dependency's package name '{}'",
