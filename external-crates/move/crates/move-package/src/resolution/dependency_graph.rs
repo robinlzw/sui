@@ -198,6 +198,32 @@ pub struct DependencyGraphBuilder<Progress: Write> {
     install_dir: PathBuf,
 }
 
+use std::path::Component;
+pub fn normal_path_components(x: &Vec<Component<'_>>) -> PathBuf {
+    let mut ret = PathBuf::new();
+    for v in x {
+        match v {
+            Component::Prefix(x) => ret.push(x.as_os_str()),
+            Component::RootDir => ret.push("/"),
+            Component::CurDir => {}
+            Component::ParentDir => {
+                let _ = ret.pop();
+            }
+            Component::Normal(x) => ret.push(*x),
+        }
+    }
+    if ret.to_str().unwrap() == "" {
+        ret.push(".")
+    }
+    ret
+}
+
+pub(crate) fn normal_path(p: &Path) -> PathBuf {
+    let x: Vec<_> = p.components().collect();
+    normal_path_components(&x)
+}
+
+
 impl<Progress: Write> DependencyGraphBuilder<Progress> {
     pub fn new(
         skip_fetch_latest_git_deps: bool,
@@ -463,7 +489,7 @@ impl<Progress: Write> DependencyGraphBuilder<Progress> {
                     })?;
                 let pkg_path = dep_pkg_path.join(local_path(&d.kind));
                 eprintln!("before get_graph, pkg_path = {:?}", pkg_path.clone());
-                let pkg_path = pkg_path.canonicalize()?;
+                let pkg_path = normal_path(pkg_path.as_path());
                 eprintln!("before get_graph, pkg_path = {:?}", pkg_path.clone());
                  
                 for entry in walkdir::WalkDir::new(pkg_path.as_path()) {
