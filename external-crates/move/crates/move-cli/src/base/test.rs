@@ -24,15 +24,15 @@ use std::{
     process::ExitStatus,
     sync::Arc,
 };
-// if windows
-#[cfg(target_family = "windows")]
-use std::os::windows::process::ExitStatusExt;
-// if unix
-#[cfg(target_family = "unix")]
-use std::os::unix::prelude::ExitStatusExt;
-// if not windows nor unix
-#[cfg(not(any(target_family = "windows", target_family = "unix")))]
-compile_error!("Unsupported OS, currently we only support windows and unix family");
+// // if windows
+// #[cfg(target_family = "windows")]
+// use std::os::windows::process::ExitStatusExt;
+// // if unix
+// #[cfg(target_family = "unix")]
+// use std::os::unix::prelude::ExitStatusExt;
+// // if not windows nor unix
+// #[cfg(not(any(target_family = "windows", target_family = "unix")))]
+// compile_error!("Unsupported OS, currently we only support windows and unix family");
 
 /// Run Move unit tests in this package.
 #[derive(Parser)]
@@ -248,11 +248,11 @@ pub fn run_move_unit_tests<W: Write + Send>(
     Ok((UnitTestResult::Success, warning_diags))
 }
 
-impl From<UnitTestResult> for ExitStatus {
-    fn from(result: UnitTestResult) -> Self {
-        match result {
-            UnitTestResult::Success => ExitStatus::from_raw(0),
-            UnitTestResult::Failure => ExitStatus::from_raw(1),
-        }
-    }
-}
+// impl From<UnitTestResult> for ExitStatus {
+//     fn from(result: UnitTestResult) -> Self {
+//         match result {
+//             UnitTestResult::Success => ExitStatus::from from_raw(0),
+//             UnitTestResult::Failure => ExitStatus::from_raw(1),
+//         }
+//     }
+// }

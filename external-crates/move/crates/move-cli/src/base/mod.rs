@@ -1,14 +1,14 @@
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
 
-pub mod build;
-pub mod coverage;
-pub mod disassemble;
-pub mod docgen;
-pub mod errmap;
-pub mod info;
-pub mod migrate;
-pub mod new;
+// pub mod build;
+// pub mod coverage;
+// pub mod disassemble;
+// pub mod docgen;
+// pub mod errmap;
+// pub mod info;
+// pub mod migrate;
+// pub mod new;
 pub mod test;
 
 use move_package::source_package::layout::SourcePackageLayout;

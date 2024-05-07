@@ -2255,12 +2255,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "cassowary"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df8670b8c7b9dae1793364eafadf7239c40d669904660c5960d74cfd80b46a53"
-
-[[package]]
 name = "cast"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6637,20 +6631,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "move-bytecode-viewer"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "crossterm",
- "move-binary-format",
- "move-bytecode-source-map",
- "move-disassembler",
- "regex",
- "tui",
-]
-
-[[package]]
 name = "move-cli"
 version = "0.1.0"
 dependencies = [
@@ -6660,27 +6640,15 @@ dependencies = [
  "codespan-reporting",
  "colored",
  "difference",
- "move-binary-format",
- "move-bytecode-utils",
- "move-bytecode-verifier",
- "move-bytecode-viewer",
  "move-command-line-common",
  "move-compiler",
  "move-core-types",
  "move-coverage",
- "move-disassembler",
- "move-docgen",
- "move-errmapgen",
- "move-ir-types",
  "move-package",
- "move-prover",
- "move-read-write-set-types",
  "move-stdlib",
  "move-unit-test",
- "move-vm-profiler",
  "move-vm-runtime",
  "move-vm-test-utils",
- "move-vm-types",
  "serde_yaml 0.8.26",
  "tempfile",
  "toml_edit 0.14.4",
@@ -15308,19 +15276,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4189890526f0168710b6ee65ceaedf1460c48a14318ceec933cb26baa492096a"
 dependencies = [
  "linked-hash-map",
-]
-
-[[package]]
-name = "tui"
-version = "0.19.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ccdd26cbd674007e649a272da4475fb666d3aa0ad0531da7136db6fab0e5bad1"
-dependencies = [
- "bitflags 1.3.2",
- "cassowary",
- "crossterm",
- "unicode-segmentation",
- "unicode-width",
 ]
 
 [[package]]

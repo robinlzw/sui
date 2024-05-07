@@ -3,13 +3,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 use base::{
-    build::Build, coverage::Coverage, disassemble::Disassemble, docgen::Docgen, errmap::Errmap,
-    info::Info, migrate::Migrate, new::New, test::Test,
+    // build::Build, coverage::Coverage, disassemble::Disassemble, docgen::Docgen, errmap::Errmap,
+    // info::Info, migrate::Migrate, new::New, 
+    test::Test,
 };
 use move_package::BuildConfig;
 
 pub mod base;
-pub mod sandbox;
 
 /// Default directory where saved Move resources live
 pub const DEFAULT_STORAGE_DIR: &str = "storage";
@@ -58,25 +58,16 @@ pub struct MoveCLI {
 
 #[derive(Parser)]
 pub enum Command {
-    Build(Build),
-    Coverage(Coverage),
-    Disassemble(Disassemble),
-    Docgen(Docgen),
-    Errmap(Errmap),
-    Info(Info),
-    Migrate(Migrate),
-    New(New),
+    // Build(Build),
+    // Coverage(Coverage),
+    // Disassemble(Disassemble),
+    // Docgen(Docgen),
+    // Errmap(Errmap),
+    // Info(Info),
+    // Migrate(Migrate),
+    // New(New),
     Test(Test),
-    /// Execute a sandbox command.
-    #[clap(name = "sandbox")]
-    Sandbox {
-        /// Directory storing Move resources, events, and module bytecodes produced by module publishing
-        /// and script execution.
-        #[clap(long, default_value = DEFAULT_STORAGE_DIR)]
-        storage_dir: PathBuf,
-        #[clap(subcommand)]
-        cmd: sandbox::cli::SandboxCommand,
-    },
+    Other,
 }
 
 pub fn run_cli(
@@ -90,27 +81,21 @@ pub fn run_cli(
     //         1. It's still using the old CostTable.
     //         2. The CostTable only affects sandbox runs, but not unit tests, which use a unit cost table.
     match cmd {
-        Command::Build(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Coverage(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Disassemble(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Docgen(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Errmap(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Info(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::Migrate(c) => c.execute(move_args.package_path, move_args.build_config),
-        Command::New(c) => c.execute_with_defaults(move_args.package_path),
+        // Command::Build(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Coverage(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Disassemble(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Docgen(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Errmap(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Info(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::Migrate(c) => c.execute(move_args.package_path, move_args.build_config),
+        // Command::New(c) => c.execute_with_defaults(move_args.package_path),
         Command::Test(c) => c.execute(
             move_args.package_path,
             move_args.build_config,
             natives,
             Some(cost_table.clone()),
         ),
-        Command::Sandbox { storage_dir, cmd } => cmd.handle_command(
-            natives,
-            cost_table,
-            error_descriptions,
-            &move_args,
-            &storage_dir,
-        ),
+        _ => Ok(())
     }
 }
 
