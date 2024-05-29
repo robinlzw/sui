@@ -1,17 +1,12 @@
+"use strict";
 // Copyright (c) The Move Contributors
 // SPDX-License-Identifier: Apache-2.0
-
-import type { AstPath, Doc, ParserOptions } from 'prettier';
-import * as prettier from 'prettier';
-import { SyntaxNode } from 'web-tree-sitter'
-
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.print = void 0;
+const prettier = require("prettier");
 const { hardline, indent, join, line, softline, group, ifBreak } = prettier.doc.builders;
-
-type printFn = (path: AstPath) => Doc;
-
-export function print(path: AstPath, options: ParserOptions, print: printFn) {
-    const node = path.getValue()
-
+function print(path, options, print) {
+    const node = path.getValue();
     switch (node.type) {
         case 'source_file':
             return join(hardline, path.map(print, 'children'));
@@ -32,8 +27,9 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
         case 'module_body':
             if (node.children.length == 2) {
                 // empty module (the only children are curlies)
-                return [ '{}' ];
-            } else {
+                return ['{}'];
+            }
+            else {
                 return [
                     '{',
                     indent([[hardline, hardline], join([hardline, hardline], path.map(print, 'namedChildren'))]),
@@ -79,7 +75,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
                 path.call(print, 'namedChildren', 2),
                 path.call(print, 'namedChildren', 3),
                 path.call(print, 'namedChildren', 4),
-            ]
+            ];
         case 'native_struct_definition':
             // same formatting as "regular" struct but (of course) without fields
             return [
@@ -88,7 +84,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
                 path.call(print, 'namedChildren', 1),
                 path.call(print, 'namedChildren', 2),
                 ';',
-            ]
+            ];
         case 'function_definition':
             let is_entry = false;
             for (let i = 0; i < node.childCount; i++) {
@@ -99,7 +95,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
             }
             // first named child may be a visibility modifier
             return [
-                node.namedChild(0).type === 'visibility_modifier' ? [ path.call(print, 'namedChildren', 0), ' '] : '',
+                node.namedChild(0).type === 'visibility_modifier' ? [path.call(print, 'namedChildren', 0), ' '] : '',
                 is_entry ? 'entry ' : '',
                 'fun ',
                 node.namedChild(0).type !== 'visibility_modifier' ? path.call(print, 'namedChildren', 0) : '',
@@ -112,7 +108,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
         case 'native_function_definition':
             // first named child may be a visibility modifier
             return [
-                node.namedChild(0).type === 'visibility_modifier' ? [ path.call(print, 'namedChildren', 0), ' '] : '',
+                node.namedChild(0).type === 'visibility_modifier' ? [path.call(print, 'namedChildren', 0), ' '] : '',
                 'native ',
                 'fun ',
                 node.namedChild(0).type !== 'visibility_modifier' ? path.call(print, 'namedChildren', 0) : '',
@@ -145,7 +141,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
                 // '$' and 'phantom' are mutually exclusive (one for macros and the other for structs)
                 node.child(0).type === '$' ? '$' : (node.child(0).type === 'phantom' ? 'phantom ' : ''),
                 path.call(print, 'firstNamedChild'),
-                node.namedChildren.length > 1 ? ': ' : '' ,
+                node.namedChildren.length > 1 ? ': ' : '',
                 join(' + ', abilities),
             ];
         case 'datatype_fields':
@@ -171,7 +167,7 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
                 path.call(print, 'namedChildren', 1),
             ];
         case 'ret_type':
-            return [ ': ', path.call(print, 'namedChildren', 0) ];
+            return [': ', path.call(print, 'namedChildren', 0)];
         case 'struct_identifier':
         case 'ability':
         case 'type_parameter_identifier':
@@ -184,26 +180,20 @@ export function print(path: AstPath, options: ParserOptions, print: printFn) {
             return node.text;
     }
 }
-
-function breakable_comma_separated_list(path: AstPath,
-                                        node: SyntaxNode,
-                                        start: string,
-                                        end: string,
-                                        print: printFn) {
-
+exports.print = print;
+function breakable_comma_separated_list(path, node, start, end, print) {
     const items = Symbol('items');
     return [
         start,
         group([
             indent(softline),
             indent(join([',', line], path.map(print, 'namedChildren'))),
-        ], {id: items}),
-        ifBreak([',', softline], '', {groupId: items}),
+        ], { id: items }),
+        ifBreak([',', softline], '', { groupId: items }),
         end,
     ];
 }
-
-function block(path: AstPath, node: SyntaxNode, print: printFn, line_ending: string) {
+function block(path, node, print, line_ending) {
     return node.namedChildren.length == 0
         ? ' {}'
         : [
@@ -215,3 +205,4 @@ function block(path: AstPath, node: SyntaxNode, print: printFn, line_ending: str
             '}',
         ];
 }
+//# sourceMappingURL=printer.js.map
